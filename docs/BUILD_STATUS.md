@@ -1,10 +1,17 @@
-# Golden Machine : Muna's Laptop
+# Golden Machine : Percision 5860 Tower
 Windows 11
-16GB RAM
-AMD Ryzen 7 8840HS w/ Radeon 780M
+Processor	Intel(R) Xeon(R) w3-2435 (3.10 GHz)
+Graphics Card: NVIDIA RTX A4000 (16GB)
+Installed RAM	32.0 GB (31.3 GB usable)
+System type	64-bit operating system, x64-based processor
 
-## Must find out Unreal and python Versions for setup steps
+Unreal Engine Version 5.7.3
+Python 3.9
+
 check the group chat for chat about how you(muna) initially set it up
-1. Install Node v
-2. Install Python 3.
-3. Clone repo : get
+1. Install Unreal Engine 5.7.3
+2. Install Python 3.9
+3. install git
+4. Open CMD
+5. Run command : git clone https://github.com/NburtonII/499-Codrone-Sim.git
+6. Open sim/CodroneSim/CodroneSim.uproject in Unreal
