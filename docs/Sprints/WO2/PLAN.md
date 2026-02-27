@@ -15,47 +15,47 @@ Defenition of Done for Week 2:
 ### Notes
 - There was no rotation of rolls for this second "Week" of work. We wanted to recover from the chaotic first week where little was accomplished. It seemed best to start the rotation on week 3.
 
-- Due to difficulties with the microsoft airsim SDK we may need to create our own solution.
+- Due to difficulties with the Microsoft AirSim SDK we may need to create our own solution.
 
 ## Story 1
 Task: Update Start guide
-- Verify the start guide with golden machine and that the instructions are clear and work without any guess work from the user from a fresh install.
+- Verify the start guide with the golden machine and that the instructions are clear and work without any guess work from the user from a fresh install.
 
 Owner: R2 - @MunachimsoAni 
 
 Finished Criteria: Following the Start guide the Project can be set up and run on the golden machine.
 
-Evidence: BUID_STATUS.MD contains instructions and can be followed.
+Evidence: BUID_STATUS.MD contains instructions that can be followed.
 
 ## Story 2
-Task: Implement a connect message and get_state message.
-- messages are sent between Unreal to the Python SDK.
-- Connect Message begins the connection between Script and Unreal
-- get_state message sends telemetry data to a the sdk.
+Task: Implement a connect message and a get_state message.
+- messages are sent from Unreal to the Python SDK.
+- Connect Message begins the connection between the Script and Unreal
+- get_state message sends telemetry data to the sdk.
 - update docs/Sim_INTERFACE.md and docs/PROTOCOL.md with new messages that record behavior.
 
 
 Owner: R4 @Itzmesuccess 
 
 Finished Criteria:
-- Unreal is able to send data to telemetry.csv when the connection is run.
+- Unreal can send data to telemetry.csv when the connection is run.
 
-Evidence: Connecte messages retunr ACK or a clear error.
+Evidence: Connected messages return ACK or a clear error.
 - ACK => acknowledge/understanding message
 
 ## Story 3
-Task: IMplementing drone.pair() and Done.close() as well as loop that writes to the telemetry.csv.
+Task: Implementing drone.pair() and Done.close() as well as a loop that writes to the telemetry.csv.
 
 Owner: R5 @sopuru-ani
 
 Finished Criteria: 
-- Using the Drone.pair() commands connects python SDK to Unreal drone object
-- While is paired paired the python script is able to record telemetry data into the csv
-    - The telemetry.csv should be a created new for each run.
+- Using the Drone.pair() commands connects python SDK to the Unreal drone object
+- While paired, the Python script can record telemetry data into the csv
+    - The telemetry.csv should be created anew for each run.
     - The instruction: Every demo run automatically creates `/runs/W02/<run_id>/run.json` and telemetry.csv.
 - Drone.close() ends connection and recording to the teleetry.csv
 
-Evidence: examples/01_connect_read_pose.py that when run runs both commands and preforms actions.
+Evidence: examples/01_connect_read_pose.py, which, when run, runs both commands and performs actions.
 
 ## Story 4
 Task: Integration Check
@@ -65,7 +65,7 @@ Owner: R1 @NburtonII
 Finished Criteria: intregration test has run and causes no issues with the system. 
  - integration test = mide-week test: start Sim -> run the demo -> verify Logs
 
-Evidence: docs/sprints/wo2/integration_check.md records pass and fails.
+Evidence: docs/sprints/wo2/integration_check.md records passes and fails.
 
 # Submission list for Week 2: 
 1. docs/PROTOCOL.md (updated to match implemented messages)
