@@ -1,7 +1,12 @@
-# Golden Machine : Muna's Laptop
+# Golden Machine : Percision 5860 Tower
 Windows 11
-16GB RAM
-AMD Ryzen 7 8840HS w/ Radeon 780M
+Processor	Intel(R) Xeon(R) w3-2435 (3.10 GHz)
+Graphics Card: NVIDIA RTX A4000 (16GB)
+Installed RAM	32.0 GB (31.3 GB usable)
+System type	64-bit operating system, x64-based processor
+
+Unreal Engine Version 5.7.3
+Python 3.9
 
 ## Must find out Unreal and python Versions for setup steps
 //Partly done blind. I would have to confirm this with a lab system
