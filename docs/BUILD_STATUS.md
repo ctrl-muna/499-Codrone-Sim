@@ -1,50 +1,79 @@
-# Golden Machine : Percision 5860 Tower
-Windows 11
-Processor	Intel(R) Xeon(R) w3-2435 (3.10 GHz)
-Graphics Card: NVIDIA RTX A4000 (16GB)
-Installed RAM	32.0 GB (31.3 GB usable)
-System type	64-bit operating system, x64-based processor
-Unreal Engine Version 5.7.3
-Python 3.9.13
+# BUILD STATUS
 
-Installations:
-1. Install Visual Studio Code Version: 1.109.4 for Windows through "https://code.visualstudio.com/download"
-2. Install Python Version 3.9.13 through command prompt entry: "winget install Python.Python.3.9"
-3. Install Epic Game Launcher through "https://www.unrealengine.com/en-US/download'
-4. Create and Login into an Epic Games Account
-5. Install Unreal Engine version 5.7.3 from the Epic Games Launcher
+## Week 3 (Milestone) – <2026 4 March>
 
-Repository Cloning: Once done with all the installation,
-6. Created a local folder titled "CSDP_499_Research" on Desktop
-7. Launch Visual Studio Code 
-8. Open "CSDP_499_Research" on Visual Studio Code
-9. Open Terminal on this folder
-10. in the terminal line ending in "...\Desktop\CSDP_499_Research>", run "git clone https://github.com/NburtonII/499-Codrone-Sim"
-11. You should now have cloned the Github repository unto "CSDP_499_Research"
+### Golden Machine (Primary Validation)
 
-Launching the Unreal Project: To open the Basic Arena, the template for our virtual simulation space:
-12. After installing Unreal Engine, Launch it
-13. On the Unreal Engine home page, Select My Projects
-14. Navigate to Browse and the bottom right corner of the My Projects window
-15. Navigate to the CSDP_499_Research folder and traverse "CSDP_499_Research\499-Codrone-Sim\sim\CodroneSim"
-16. Double-click on CodroneSim.uproject to open the file
-17. Once the project opens, Click Content Drawer, at the bottom left of the window
-18. Next, Click Maps
-19. Double-click on BasinArena when it shows up
-20. BasicArena acquired
+Location: Classroom PC (Golden Machine)
+Machine: Dell Precision 5860 Tower
+OS: Windows 11 (64-bit)
+CPU: Intel(R) Xeon(R) w3-2435 (3.10 GHz)
+GPU: NVIDIA RTX A4000 (16GB)
+RAM: 32 GB
+Unreal Engine: 5.7.3
+Python: 3.9.13
 
-Setting AirSim
-21. Repeat this steps(previously mentioned) if necessary(closed your instance of Visual Studio Code etc):
-    1. Launch Visual Studio Code 
-    2. Open "CSDP_499_Research" on Visual Studio Code
-    3. Open Terminal on this folder
-22. in the terminal line ending in "...\Desktop\CSDP_499_Research>", run the following:
-    1. "git clone https://github.com/microsoft/AirSim.git"
-    2. "cd AirSim"
-23. Press the Windows button and in the search bar, search "x64 Native Tools Command Prompt for VS 2022". This leads to the Visual Studio 2022 Developer Command Prompt v17.14.17
-24. On the Visual Studio 2022 Developer Command Prompt v17.14.17, run the following:
-    1. "cd C:\Users\animu\OneDrive\Desktop\CSDP_499_Research\AirSim"
-    2. "build.cmd"
-28. Ran into errors : Couldn't find the GenerateProjectFiles.bat
+### Secondary Validation Machine (Milestone Requirement)
 
-Setting Up Python Environment
+Machine: <FILL IN AFTER TEST>
+OS: <...>
+GPU: <...>
+RAM: <...>
+
+---
+
+## Reproducible Run Workflow (Editor)
+
+1. Clone:
+   - git clone https://github.com/NburtonII/499-Codrone-Sim.git
+   - cd 499-Codrone-Sim
+2. Open Unreal project:
+   - sim/CodroneSim/CodroneSim.uproject
+3. In Unreal Editor:
+   - Content Drawer → Content/Maps → BasicArena
+   - Press Play (▶)
+
+Expected:
+
+- BasicArena loads
+- You spawn inside arena
+- Walls block movement
+
+---
+
+## Packaged Build Artifact (Windows Development)
+
+Artifact link: <TO BE ADDED AFTER PACKAGING>
+
+Run:
+
+- Download + unzip
+- Launch: CodroneSim.exe (inside packaged folder)
+
+Expected:
+
+- Build launches successfully
+
+---
+
+## Validation Results
+
+Golden Machine: <PASS/FAIL> (notes)
+Secondary Machine: <PASS/FAIL> (notes)
+
+---
+
+## Milestone Validation Note (Week 3)
+
+Verified the packaged build on a second machine/account at least once: <PASS/FAIL>
+Evidence: <artifact link> + (optional) screenshot/video
+
+---
+
+## Release Notes (Week 3)
+
+-
+
+## Known Issues
+
+- <ADD IF ANY>
