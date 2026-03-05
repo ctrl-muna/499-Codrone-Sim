@@ -3,6 +3,6 @@
 ## Create the virtual evironment
  ## on windows use python -m venv .venv, Then env\scripts\activate.bat
 ## 1. Install the SDK using 'pip install -e ./sdk'
-## 2. Run this file using 'python 00_sdk_smoke.py' to verify the SDK is working correctly
-from sdk import setup
+## 2. Run this file using 'python 00_sdk_smoke.py' to verify the SDK is working correc
+import codrone_simulator 
 print("SDK smoke test passed successfully")
