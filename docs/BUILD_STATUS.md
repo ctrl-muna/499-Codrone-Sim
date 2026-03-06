@@ -1,6 +1,6 @@
 # BUILD STATUS
 
-## Week 3 (Milestone) – <2026 4 March>
+## Week 3 (Milestone) – <2026 6 March>
 
 ### Golden Machine (Primary Validation)
 
@@ -15,10 +15,10 @@ Python: 3.9.13
 
 ### Secondary Validation Machine (Milestone Requirement)
 
-Machine: <FILL IN AFTER TEST>
-OS: <...>
-GPU: <...>
-RAM: <...>
+Machine: Personal Laptop
+OS: Windows 10 Home
+GPU: Intel(R) UHD Graphics 620 (128 MB)
+RAM: 8 GB
 
 ---
 
@@ -43,7 +43,7 @@ Expected:
 
 ## Packaged Build Artifact (Windows Development)
 
-Artifact link: <TO BE ADDED AFTER PACKAGING>
+Artifact link: https://github.com/NburtonII/499-Codrone-Sim/releases/tag/v0.3-week3
 
 Run:
 
@@ -58,22 +58,25 @@ Expected:
 
 ## Validation Results
 
-Golden Machine: <PASS/FAIL> (notes)
-Secondary Machine: <PASS/FAIL> (notes)
+Golden Machine: PASS
+Secondary Machine: PASS
 
 ---
 
 ## Milestone Validation Note (Week 3)
 
-Verified the packaged build on a second machine/account at least once: <PASS/FAIL>
-Evidence: <artifact link> + (optional) screenshot/video
+Verified the packaged build on a second machine/account at least once: PASS
+Evidence: https://github.com/NburtonII/499-Codrone-Sim/releases/tag/v0.3-week3
 
 ---
 
 ## Release Notes (Week 3)
 
+- Packaged Windows development build created.
+- Default map set to BasicArena.
+- Verified build runs on golden machine and secondary machine.
 -
 
 ## Known Issues
 
-- <ADD IF ANY>
+- None at this time
