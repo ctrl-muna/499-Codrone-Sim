@@ -1,5 +1,6 @@
 # Unreal Engine
-sim/Plugins/ProjectAirSim/SimLibs/eigen/include
+sim/Plugins/ProjectAirSim/SimLibs/
+sdk/ProjectAirSim/
 Binaries/
 DerivedDataCache/
 Intermediate/
