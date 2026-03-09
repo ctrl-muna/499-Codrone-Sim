@@ -1,0 +1,36 @@
+16:08:17:678 [INFO] Connecting to simulation server at 127.0.0.1
+16:08:17:687 [INFO] Connection opened.
+16:08:17:688 [INFO] Started the pub-sub topic receiving thread.
+16:08:17:689 [INFO] Loading scene config: scene_basic_drone.jsonc
+16:08:18:497 [INFO] Getting the list of available topic info from the sim server...
+16:08:18:517 [INFO] Successfully received topic info list.
+16:08:20:530 [INFO] World object updated for the loaded scene '/Sim/SceneBasicDrone'. Note: Any previous Drone object instances may no longer be valid.
+16:08:20:533 [INFO] Trajectory 'null_trajectory' imported successfully.
+16:08:20:533 [INFO] Initalizing Drone 'Drone1'...
+16:08:20:534 [INFO] -------------------------------------------------
+16:08:20:535 [INFO] The following topics can be subscribed to for robot 'Drone1':
+16:08:20:535 [INFO]     sensors["Chase"]["scene_camera"]
+16:08:20:535 [INFO]     sensors["Chase"]["scene_camera_info"]
+16:08:20:536 [INFO]     sensors["DownCamera"]["scene_camera"]
+16:08:20:536 [INFO]     sensors["DownCamera"]["scene_camera_info"]
+16:08:20:538 [INFO]     sensors["DownCamera"]["depth_camera"]
+16:08:20:538 [INFO]     sensors["DownCamera"]["depth_camera_info"]
+16:08:20:539 [INFO]     sensors["IMU1"]["imu_kinematics"]
+16:08:20:539 [INFO]     sensors["GPS"]["gps"]
+16:08:20:539 [INFO]     sensors["Barometer"]["barometer"]
+16:08:20:540 [INFO]     sensors["Magnetometer"]["magnetometer"]
+16:08:20:540 [INFO]     robot_info["actual_pose"]
+16:08:20:542 [INFO]     robot_info["collision_info"]
+16:08:20:542 [INFO]     robot_info["rotor_info"]
+16:08:20:542 [INFO] -------------------------------------------------
+16:08:20:543 [INFO] Drone 'Drone1' initialized for World scene '/Sim/SceneBasicDrone'
+16:08:20:547 [INFO] takeoff_async: starting
+16:08:23:648 [INFO] takeoff_async: completed
+16:08:23:649 [INFO] Move-Up invoked
+16:08:27:692 [INFO] Move-Up completed
+16:08:27:694 [INFO] Move-Down invoked
+16:08:31:740 [INFO] Move-Down completed
+16:08:31:741 [INFO] land_async: starting
+16:08:40:161 [INFO] land_async: completed
+16:08:40:163 [INFO] Disconnecting from simulation server...
+16:08:40:212 [INFO] Disconnected.
