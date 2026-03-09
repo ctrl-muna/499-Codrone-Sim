@@ -1,0 +1,15 @@
+14:27:03:997 [INFO] Connecting to simulation server at 127.0.0.1
+14:27:04:005 [INFO] Connection opened.
+14:27:04:006 [INFO] Started the pub-sub topic receiving thread.
+14:27:04:006 [INFO] Loading scene config: scene_basic_drone.jsonc
+14:27:04:011 [ERROR] Exception occurred: [Errno 2] No such file or directory: 'sim_config/scene_basic_drone.jsonc'
+Traceback (most recent call last):
+  File "c:\Users\Ncburton\Desktop\Student Files\499 Projects\499-Codrone-Sim\sdk\ProjectAirSim\client\python\example_user_scripts\hello_drone.py", line 28, in main
+    world = World(client, "scene_basic_drone.jsonc", delay_after_load_sec=2)
+  File "C:\Users\Ncburton\Desktop\Student Files\499 Projects\499-Codrone-Sim\sdk\ProjectAirSim\client\python\projectairsim\src\projectairsim\world.py", line 63, in __init__
+    config_loaded, config_paths = load_scene_config_as_dict(
+  File "C:\Users\Ncburton\Desktop\Student Files\499 Projects\499-Codrone-Sim\sdk\ProjectAirSim\client\python\projectairsim\src\projectairsim\utils.py", line 495, in load_scene_config_as_dict
+    with open(total_path) as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'sim_config/scene_basic_drone.jsonc'
+14:27:04:019 [INFO] Disconnecting from simulation server...
+14:27:04:053 [INFO] Disconnected.
