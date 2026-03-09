@@ -1,4 +1,6 @@
 # Unreal Engine
+sim/Plugins/ProjectAirSim/SimLibs/
+sdk/ProjectAirSim/
 Binaries/
 DerivedDataCache/
 Intermediate/
