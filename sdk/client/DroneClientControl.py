@@ -21,19 +21,19 @@ async def main():
     Running  = True
     ###Intro
     try:
-        print("Welcome to to Class 499's Codrone Simulator!\n We will begin the connecting process now.")
+        projectairsim_log().info("Welcome to to Class 499's Codrone Simulator!\n We will begin the connecting process now.")
         while Running:
             await DroneController.Input_Command()
             Input = input("Continue Flying? (y/n): ")
             if Input.lower() == "n":
                 Running = False
     except KeyboardInterrupt:
-        print("\nInterrupted by user.")
+        projectairsim_log().info("\nInterrupted by user.")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        projectairsim_log().error(f"An error occurred: {e}")
 
     finally:
-        print("Exiting Drone Control. Goodbye!\n")
+        projectairsim_log().info("Exiting Drone Control. Goodbye!\n")
         DroneController.close()
 
 
