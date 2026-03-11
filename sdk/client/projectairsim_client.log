@@ -1,0 +1,38 @@
+13:32:06:641 [INFO] Connecting to simulation server at 127.0.0.1
+13:32:06:648 [INFO] Connection opened.
+13:32:06:649 [INFO] Started the pub-sub topic receiving thread.
+13:32:06:650 [INFO] Loading scene config: scene_basic_drone.jsonc
+13:32:07:625 [INFO] Getting the list of available topic info from the sim server...
+13:32:07:647 [INFO] Successfully received topic info list.
+13:32:09:660 [INFO] World object updated for the loaded scene '/Sim/SceneBasicDrone'. Note: Any previous Drone object instances may no longer be valid.
+13:32:09:661 [INFO] Trajectory 'null_trajectory' imported successfully.
+13:32:09:661 [INFO] Initalizing Drone 'Drone1'...
+13:32:09:662 [INFO] -------------------------------------------------
+13:32:09:662 [INFO] The following topics can be subscribed to for robot 'Drone1':
+13:32:09:662 [INFO]     sensors["Chase"]["scene_camera"]
+13:32:09:662 [INFO]     sensors["Chase"]["scene_camera_info"]
+13:32:09:663 [INFO]     sensors["DownCamera"]["scene_camera"]
+13:32:09:663 [INFO]     sensors["DownCamera"]["scene_camera_info"]
+13:32:09:663 [INFO]     sensors["DownCamera"]["depth_camera"]
+13:32:09:663 [INFO]     sensors["DownCamera"]["depth_camera_info"]
+13:32:09:663 [INFO]     sensors["IMU1"]["imu_kinematics"]
+13:32:09:665 [INFO]     sensors["GPS"]["gps"]
+13:32:09:665 [INFO]     sensors["Barometer"]["barometer"]
+13:32:09:665 [INFO]     sensors["Magnetometer"]["magnetometer"]
+13:32:09:665 [INFO]     robot_info["actual_pose"]
+13:32:09:666 [INFO]     robot_info["collision_info"]
+13:32:09:666 [INFO]     robot_info["rotor_info"]
+13:32:09:666 [INFO] -------------------------------------------------
+13:32:09:666 [INFO] Drone 'Drone1' initialized for World scene '/Sim/SceneBasicDrone'
+13:32:15:121 [INFO] takeoff_async: starting
+13:32:17:954 [INFO] takeoff_async: completed
+13:32:17:955 [INFO] Drone State at Wed Mar 11 13:32:17 2026:
+  Position  -> N: -0.000, E: -0.000, D: -1.603
+  Orientation -> W: 1.000, X: 0.000, Y: 0.000, Z: 0.000
+13:32:30:409 [INFO] land_async: starting
+13:32:37:655 [INFO] land_async: completed
+13:32:37:656 [INFO] Drone State at Wed Mar 11 13:32:37 2026:
+  Position  -> N: -0.000, E: -0.000, D: -0.293
+  Orientation -> W: 1.000, X: 0.000, Y: 0.000, Z: 0.000
+13:32:47:606 [INFO] Disconnecting from simulation server...
+13:32:47:647 [INFO] Disconnected.
