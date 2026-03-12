@@ -1,2 +1,2 @@
-# CSDP-499 CoDrone Architecture Docuemnt 
+# CSDP-499 CoDrone Architecture Document  
 
