@@ -3,7 +3,7 @@ import asyncio
 
 from projectairsim import ProjectAirSimClient, Drone, World
 from projectairsim.utils import projectairsim_log
-from projectairsim.image_utils import ImageDisplay
+
 
 
 ###imports for user Control
@@ -28,13 +28,17 @@ async def main():
             if Input.lower() == "n":
                 Running = False
     except KeyboardInterrupt:
+        DroneController.close()
         projectairsim_log().info("\nInterrupted by user.")
+        
     except Exception as e:
+        DroneController.close()
         projectairsim_log().error(f"An error occurred: {e}")
 
     finally:
-        projectairsim_log().info("Exiting Drone Control. Goodbye!\n")
         DroneController.close()
+        projectairsim_log().info("Exiting Drone Control. Goodbye!\n")
+        
 
 
 if __name__ == "__main__":
