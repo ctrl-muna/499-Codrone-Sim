@@ -1,0 +1,17 @@
+{
+  "mission_id": "square_path",
+  "description": "Fly a square path: takeoff, four forward legs with right turns, land.",
+  "version": "1.0",
+  "steps": [
+    { "command": "Takeoff",   "duration": 0 },
+    { "command": "Forward",   "duration": 2 },
+    { "command": "Yaw_Right", "duration": 2 },
+    { "command": "Forward",   "duration": 2 },
+    { "command": "Yaw_Right", "duration": 2 },
+    { "command": "Forward",   "duration": 2 },
+    { "command": "Yaw_Right", "duration": 2 },
+    { "command": "Forward",   "duration": 2 },
+    { "command": "Yaw_Right", "duration": 2 },
+    { "command": "Land",      "duration": 0 }
+  ]
+}
