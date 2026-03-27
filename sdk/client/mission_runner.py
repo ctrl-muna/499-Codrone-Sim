@@ -14,6 +14,8 @@ import json
 import os
 import time
 
+from range_sensor import get_front_range
+
 # Must match UserControl.commandList exactly (case-sensitive).
 VALID_COMMANDS = [
     "Reset", "Close", "Takeoff", "State_Polling", "Land",
@@ -85,6 +87,7 @@ async def run_mission(json_path, controller):
     start_time = time.time()
     success = True
     failure_reason = None
+    front_range_readings = []
 
     try:
         for step in steps:
@@ -93,6 +96,11 @@ async def run_mission(json_path, controller):
 
             controller.save_Command(command, duration)
             await controller.commandParse(command, duration)
+
+            # Collect a front range reading after each step.
+            reading_m = await get_front_range(controller, timeout_s=0.5)
+            if reading_m is not None:
+                front_range_readings.append(reading_m * 100.0)  # store in cm
 
             # Stop the mission early if a collision was detected mid-step.
             if controller.collision:
@@ -110,11 +118,14 @@ async def run_mission(json_path, controller):
     # reported as 0 or 1 here. Multi-collision counting is a future enhancement.
     collisions = 1 if controller.collision else 0
 
+    min_front_range_cm = round(min(front_range_readings), 3) if front_range_readings else None
+
     metrics = {
         "success": success,
         "completion_time_s": completion_time_s,
         "collisions": collisions,
         "failure_reason": failure_reason,
+        "min_front_range_cm": min_front_range_cm,
     }
 
     _write_metrics(metrics, controller)

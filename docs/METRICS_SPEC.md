@@ -74,8 +74,32 @@ runs/
 
 | Field               | Planned week | Description                                 |
 |---------------------|--------------|---------------------------------------------|
-| `min_front_range_cm`| Week 6       | Minimum front range reading during the run  |
 | structured failure codes | Week 10 | e.g. `collision`, `out_of_bounds`, `timeout`|
+
+---
+
+## Week 6 Schema (full fields)
+
+```json
+{
+  "success": true,
+  "completion_time_s": 12.4,
+  "collisions": 0,
+  "failure_reason": null,
+  "min_front_range_cm": 180.0
+}
+```
+
+### New Week 6 field
+
+| Field               | Type              | Required | Description                                                         |
+|---------------------|-------------------|----------|---------------------------------------------------------------------|
+| `min_front_range_cm`| float (>= 0) or null | No   | Minimum FrontRange reading in cm during the run; null if no readings collected |
+
+- **`min_front_range_cm`** is `null` if `get_front_range()` returned `None` for every
+  poll during the mission (e.g. sensor not connected, or very short mission with no
+  statePoll cycles).
+- Values are in **centimetres** (metres × 100) to match telemetry column units.
 
 ---
 
@@ -84,8 +108,12 @@ runs/
 `tests/test_metrics_schema_min.py` provides unit tests that validate any metrics dict
 against the Week 5 minimum schema without requiring a simulator connection.
 
+`tests/test_range_columns_present.py` provides unit tests that validate the Week 6
+metrics fields and telemetry columns.
+
 Run with:
 
 ```bash
 pytest tests/test_metrics_schema_min.py
+pytest tests/test_range_columns_present.py
 ```
