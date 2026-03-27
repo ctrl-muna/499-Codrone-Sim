@@ -469,6 +469,32 @@
       "type": "magnetometer",
       "enabled": false,
       "parent-link": "Frame"
+    },
+    {
+      "id": "FrontRange",
+      "type": "distance-sensor",
+      "enabled": true,
+      "parent-link": "Frame",
+      "max-distance": 50.0,
+      "min-distance": 0.2,
+      "draw-debug-points": true,
+      "origin": {
+        "xyz": "0.1 0 0",
+        "rpy-deg": "0 0 0"
+      }
+    },
+    {
+      "id": "BottomRange",
+      "type": "distance-sensor",
+      "enabled": true,
+      "parent-link": "Frame",
+      "max-distance": 20.0,
+      "min-distance": 0.2,
+      "draw-debug-points": true,
+      "origin": {
+        "xyz": "0 0 0",
+        "rpy-deg": "0 -90 0"
+      }
     }
   ]
 }
