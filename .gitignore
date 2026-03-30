@@ -14,3 +14,21 @@ Saved/
 # OS / editor
 .DS_Store
 Thumbs.db
+<<<<<<< HEAD
+=======
+
+# Python
+venv/
+.env/
+
+# Unreal / simulation
+Intermediate/
+Build/
+Saved/
+
+# Large binaries
+*.pyd
+*.bin
+*.pak
+*.ucas
+>>>>>>> origin/Project-airsim-integration

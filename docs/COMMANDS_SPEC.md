@@ -20,6 +20,7 @@ The system will give an error if commands are sent through the terminal that are
 - Preconditions: The Drone has to be on the ground/landed. If it is in the air, the takeoff method will return an error.
 - The Command Log will store takeoff Commands like so: 
     - DayofTheWeek Month Date Time year, Takeoff,0
+
     > The 0 at the end is returned for all commands that do not accept a duration.
 
 ##### Land
@@ -28,13 +29,14 @@ The system will give an error if commands are sent through the terminal that are
 - Parameters: No parameters required here. If a duration is given, it will simply do nothing. 
 - Preconditions: The Drone has to be in the air. If it is airborne, then the  land method will return an error.
 - The Command Log will store takeoff Commands like so: 
-    - dayofTheWeek Month Date Time year, Land,0
+
 ##### State_Polling
 - Syntax Example: State_Polling(Duration)
 - Description: This command reports on the location and status of the drone both in the terminal and the telemetry log for the run.
 - Parameters: Duration is required.
 - Preconditions: No preconditions required.
 - The Command Log will store takeoff Commands like so: 
+    - DayofTheWeek Month Date Time year, State_Polling,0
     - DayofTheWeek Month Date Time year, State_Polling,0
 - The telemetry log will store each telemetry data entry like so:
     - dayofTheWeek Month Date Time year,Pos_x,Pos_y,Pos_z,orientation_w,orientation_y,orientation_y,orientation_z
@@ -119,7 +121,29 @@ As of now, there are only two states the drone can be in, but we will add more.
 - Takeoff = False
     - Assumed that the  drone is on the ground. Takeoff() is valid, and Land() is Disabled.
 - Takeoff = True
+- Description: This command ends the client's connection to the Unreal Server.
+- Parameters: No parameters required here. If a duration is given, it will simply do nothing. 
+- Preconditions: the Client has to be connected.
+- The Command Log will store takeoff Commands like so: 
+    - dayofTheWeek Month Date Time year, Close,0
+
+##### Reset
+- Syntax Example: Reset()
+- Description: This command ends the client's connection to the Unreal Server and attempts to reconnect.
+- Parameters: No parameters required here. If a duration is given, it will simply do nothing. 
+- Preconditions: the Client has to be connected.
+- The Command Log will store takeoff Commands like so: 
+    - dayofTheWeek Month Date Time year, Reset,0
+ 
+## State Model
+As of now, there are only two states the drone can be in, but we will add more.
+- Takeoff = False
+    - Assumed that the  drone is on the ground. Takeoff() is valid, and Land() is Disabled.
+- Takeoff = True
     - Assumed that the drone is in the air. Takeoff() is disabled, and Land() is valid.
+
+    - Assumed that the drone is in the air. Takeoff() is disabled, and Land() is valid.
+   
 ## Data Logging
 There are 3 files/folders that store important data.
 - Startup.json
@@ -145,3 +169,5 @@ Each entry is stored in the format:
 
 ## Run Number System
 Each run is identified by its own unique integer. When the System is closed, this number is incremented in preparation for the next run. These numbers are used to create the Run_x_Commands.csv file for storing a log of Commands, and the Run_x_telemetry.csv file for storing the telemetry data. 
+
+- DayofTheWeek Month Dat TimeStamp Year, Command, Duration
