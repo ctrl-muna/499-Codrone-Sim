@@ -32,24 +32,21 @@ class UserControl:
         self.Kill_z_up = -100
         self.kill_z_down = 0.5
 
+        # store the scene config name so resetSimulator() can reload it
+        self.scene_config_name = "scene_basic_drone.jsonc"
+
     def connect(self):
         try:
             setupFile = os.path.join(self.project_root, 'runs', 'Startup.json')
             self.client.connect()
             try:
-                self.world = World(self.client, "scene_basic_drone.jsonc", delay_after_load_sec=2)
+                self.world = World(self.client, self.scene_config_name, delay_after_load_sec=2)
             except Exception as e:
                 projectairsim_log().error(f"Error creating world: {e}")
 
             self.drone = Drone(self.client, self.world, "Drone1")
-            self.client.subscribe(
-                self.drone.robot_info["actual_pose"],
-                lambda _,pose: setattr(self,'latest_pose',pose)
-                )
-            self.client.subscribe(
-                self.drone.robot_info["collision_info"],
-                lambda _,collision: self._on_collision(collision)
-            )
+            self._subscribe_drone_topics()  # <-- replaces the two client.subscribe calls
+       
         ###Read the set up file and get the run number.
         except Exception as e:
             projectairsim_log().error(f"Error during connection and setup: {e}")    
@@ -68,12 +65,20 @@ class UserControl:
         self.drone.enable_api_control()
         self.drone.arm()
         
-    
-    def save_Command(self, command, Duration):
+    def _subscribe_drone_topics(self):
+    ###Subscribe to pose and collision topics for the current drone object.
+        self.client.subscribe(
+            self.drone.robot_info["actual_pose"],
+            lambda _, pose: setattr(self, 'latest_pose', pose)
+        )
+        self.client.subscribe(
+            self.drone.robot_info["collision_info"],
+            lambda _, collision: self._on_collision(collision)
+        )
+
+    def save_Command(self, command, Duration, status="ok", notes=""):
         current_Date = time.asctime(time.localtime())
-        Command_message = f"{current_Date},{command},{Duration}"
-        ##This will save the command to the run file and close it after the command is saved
-        ##Open Commadn file(Create if it doesnt exist)
+        Command_message = f"{current_Date},{command},{Duration},{status},{notes}"
         with open(self.CommandFilePath, 'a') as f:
             f.write(Command_message + "\n")
     
@@ -82,21 +87,46 @@ class UserControl:
             f.write(f"{telemetry_data['timestamp']},{telemetry_data['position']['x']},{telemetry_data['position']['y']},{telemetry_data['position']['z']},"
                     f"{telemetry_data['orientation']['w']},{telemetry_data['orientation']['x']},{telemetry_data['orientation']['y']},{telemetry_data['orientation']['z']},{self.collision}\n")
     
-    def resetDrone(self):
+    def resetSimulator(self):
+    ### Send a reset to the simulator by reloading the scene config.
+    ###This is the protocol-level reset: the sim discards all object state
+    ###and returns everything to its initial pose, equivalent to a fresh launch.
+        projectairsim_log().info("resetSimulator: sending LoadScene request to simulator...")
+
         try:
-            self.drone.disarm()
-            self.drone.disable_api_control()
-            self.drone = None
-            self.drone = Drone(self.client, self.world, "Drone1")
+            # Disarm safely before reloading
+            try:
+                self.drone.disarm()
+                self.drone.disable_api_control()
+            except Exception:
+                pass
+
+            # This is the actual sim-side reset message.
+            # world.load_scene() calls client.request({ "method": "/Sim/LoadScene", ... })
+            # which tells the simulator to destroy and rebuild the entire scene.
+            self.world.load_scene(
+                self.world.get_configuration(),
+                delay_after_load_sec=2
+            )
+            projectairsim_log().info("resetSimulator: scene reloaded successfully.")
+
         except Exception as e:
-            projectairsim_log().error(f"Error during reset: {e}")
-        
+            projectairsim_log().error(f"resetSimulator: failed to reload scene — {e}")
+            return
+
+        # Re-initialize the drone object against the fresh scene
         try:
             self.drone = Drone(self.client, self.world, "Drone1")
+            self._subscribe_drone_topics()
             self.drone.enable_api_control()
             self.drone.arm()
+            self.takeOff = False
+            self.collision = False
+            self.latest_pose = None
+            projectairsim_log().info("resetSimulator: drone re-initialized. Ready to fly.")
         except Exception as e:
-            projectairsim_log().error(f"Error during reset: {e}")
+            projectairsim_log().error(f"resetSimulator: drone re-initialization failed — {e}")
+    
     ##need to add an array of velocities
     async def commandParse(self, com, dur):
         ## Commands to be implemented "Foward, backward, left, up, down, right, yaw_left, yaw_right, hover, pitch_foward, pitch_back, roll_left, roll_right"
@@ -104,30 +134,39 @@ class UserControl:
         if com == "Close":
             self.close()
         elif com == "Reset":
-            projectairsim_log().info("Resetting Drone and Environment")
-            self.resetDrone()
-            self.takeOff = False
+            projectairsim_log().info("Reset: initiating simulator-level scene reload...")
+            self.resetSimulator()
         elif com == "Takeoff" or com == "Land":
             if com == "Takeoff":
                 if self.takeOff:
                     projectairsim_log().info("Drone is has already taken off.")
                 else:
-                    projectairsim_log().info("takeoff_async: starting")
-                    takeoff_task = (await self.drone.takeoff_async())
-                    await takeoff_task  # schedule an async task to start the command
-                    projectairsim_log().info("takeoff_async: completed")
-                    self.takeOff = True
-                    await self.statePoll(1)
+                    try:
+                        projectairsim_log().info("takeoff_async: starting")
+                        takeoff_task = await self.drone.takeoff_async()
+                        await takeoff_task
+                        projectairsim_log().info("takeoff_async: completed")
+                        self.takeOff = True
+                        await self.statePoll(1)
+                    except Exception as e:
+                        projectairsim_log().error(f"takeoff_async: FAILED — {e}")
+                        self.save_Command(com, dur, status="failed", notes=str(e))
+                        return
             elif com == "Land":
                 if not self.takeOff:
                     projectairsim_log().info("Drone is not in the air.")
                 else:
-                    projectairsim_log().info("land_async: starting")
-                    land_task = (await self.drone.land_async())
-                    await land_task  # schedule an async task to start the command
-                    projectairsim_log().info("land_async: completed")
-                    self.takeOff = False
-                    await self.statePoll(1)
+                    try:
+                        projectairsim_log().info("land_async: starting")
+                        land_task = await self.drone.land_async()
+                        await land_task
+                        projectairsim_log().info("land_async: completed")
+                        self.takeOff = False
+                        await self.statePoll(1)
+                    except Exception as e:
+                        projectairsim_log().error(f"land_async: FAILED — {e}")
+                        self.save_Command(com, dur, status="failed", notes=str(e))
+                        return
         elif com == "State_Polling":
             projectairsim_log().info("State Polling: Started")
             await self.statePoll(dur)
@@ -136,70 +175,78 @@ class UserControl:
             if not self.takeOff:
                 projectairsim_log().info("Drone is not in the air.")
             else:
-                speed = 5
-                Degrees = 90
-                yaw_velocity = 30  # degrees per second
-                if com == "Yaw_Left":
-                    Degrees = 90    
-                elif com == "Yaw_Right":
-                    Degrees = -90
-                heading_45_task = await self.drone.rotate_to_yaw_async(
-                    yaw= math.radians(Degrees), timeout_sec=dur, margin = 0, callback=None
+                try:
+                    speed = 5
+                    Degrees = 90
+                    yaw_velocity = 30  # degrees per second
+                    if com == "Yaw_Left":
+                        Degrees = 90
+                    elif com == "Yaw_Right":
+                        Degrees = -90
+                    heading_45_task = await self.drone.rotate_to_yaw_async(
+                        yaw=math.radians(Degrees), timeout_sec=dur, margin=0, callback=None
                     )
-                projectairsim_log().info(f"{com} Invoked")
-                await heading_45_task
-                projectairsim_log().info(f"{com} Completed")
-                await self.statePoll(1)
+                    projectairsim_log().info(f"{com} Invoked")
+                    await heading_45_task
+                    projectairsim_log().info(f"{com} Completed")
+                    await self.statePoll(1)
+                except Exception as e:
+                    projectairsim_log().error(f"{com}: FAILED — {e}")
+                    self.save_Command(com, dur, status="failed", notes=str(e))
+                    return
         elif com in ["Forward", "Backward", "Left", "Right", "Up", "Down"]:
             if not self.takeOff:
                 projectairsim_log().info("Drone is not in the air.")
             else:
-                velocity = 5  # Default velocity value
-                if com == "Forward":
-                   move_down_task = await self.drone.move_by_velocity_async(
-                    v_north=velocity, v_east=0.0, v_down=0.0, duration=dur
-                   )
-                   projectairsim_log().info("Move-Forward Invoked")
-                   await move_down_task
-                   projectairsim_log().info("Move-Forward Completed")
-                elif com == "Backward":
-                    move_down_task = await self.drone.move_by_velocity_async(
-                    v_north=-velocity, v_east=0.0, v_down=0.0, duration=dur
-                   )
-                    projectairsim_log().info("Move-Backward Invoked")
-                    await move_down_task
-                    projectairsim_log().info("Move-Backward Completed")
-                elif com == "Left":
-                    move_down_task = await self.drone.move_by_velocity_async(
-                    v_north=0.0, v_east=-velocity, v_down=0.0, duration=dur
-                   )
-                    projectairsim_log().info("Move-Left Invoked")
-                    await move_down_task
-                    projectairsim_log().info("Move-Left Completed")
-                elif com == "Right":
-                    move_down_task = await self.drone.move_by_velocity_async(
-                    v_north=0.0, v_east=velocity, v_down=0.0, duration=dur
-                   )
-                    projectairsim_log().info("Move-Right Invoked")
-                    await move_down_task
-                    projectairsim_log().info("Move-Right Completed")
-
-                elif com == "Up":
-                    move_down_task = await self.drone.move_by_velocity_async(
-                    v_north=0.0, v_east=0.0, v_down=-velocity, duration=dur
-                   )
-                    projectairsim_log().info("Move-Up Invoked")
-                    await move_down_task
-                    projectairsim_log().info("Move-Up Completed")
-
-                elif com == "Down":
-                    move_down_task = await self.drone.move_by_velocity_async(
-                    v_north=0.0, v_east=0.0, v_down=velocity, duration=dur
-                   )
-                    projectairsim_log().info("Move-Down Invoked")
-                    await move_down_task
-                    projectairsim_log().info("Move-Down Completed")
-                await self.statePoll(1)
+                try:
+                    velocity = 5  # Default velocity value
+                    if com == "Forward":
+                        move_down_task = await self.drone.move_by_velocity_async(
+                            v_north=velocity, v_east=0.0, v_down=0.0, duration=dur
+                        )
+                        projectairsim_log().info("Move-Forward Invoked")
+                        await move_down_task
+                        projectairsim_log().info("Move-Forward Completed")
+                    elif com == "Backward":
+                        move_down_task = await self.drone.move_by_velocity_async(
+                            v_north=-velocity, v_east=0.0, v_down=0.0, duration=dur
+                        )
+                        projectairsim_log().info("Move-Backward Invoked")
+                        await move_down_task
+                        projectairsim_log().info("Move-Backward Completed")
+                    elif com == "Left":
+                        move_down_task = await self.drone.move_by_velocity_async(
+                            v_north=0.0, v_east=-velocity, v_down=0.0, duration=dur
+                        )
+                        projectairsim_log().info("Move-Left Invoked")
+                        await move_down_task
+                        projectairsim_log().info("Move-Left Completed")
+                    elif com == "Right":
+                        move_down_task = await self.drone.move_by_velocity_async(
+                            v_north=0.0, v_east=velocity, v_down=0.0, duration=dur
+                        )
+                        projectairsim_log().info("Move-Right Invoked")
+                        await move_down_task
+                        projectairsim_log().info("Move-Right Completed")
+                    elif com == "Up":
+                        move_down_task = await self.drone.move_by_velocity_async(
+                            v_north=0.0, v_east=0.0, v_down=-velocity, duration=dur
+                        )
+                        projectairsim_log().info("Move-Up Invoked")
+                        await move_down_task
+                        projectairsim_log().info("Move-Up Completed")
+                    elif com == "Down":
+                        move_down_task = await self.drone.move_by_velocity_async(
+                            v_north=0.0, v_east=0.0, v_down=velocity, duration=dur
+                        )
+                        projectairsim_log().info("Move-Down Invoked")
+                        await move_down_task
+                        projectairsim_log().info("Move-Down Completed")
+                    await self.statePoll(1)
+                except Exception as e:
+                    projectairsim_log().error(f"{com}: FAILED — {e}")
+                    self.save_Command(com, dur, status="failed", notes=str(e))
+                    return
                 
     def _on_collision(self, collision):
         if not collision.get("has_collided", False):
@@ -300,7 +347,7 @@ class UserControl:
                 projectairsim_log().error(f"Command must be one of the following: {'| '.join(self.commandList)}. Please try again.")
                 command = None
         
-        self.save_Command(command, duration)
+        self.save_Command(command, duration, status="ok", notes="")
         await self.commandParse(command, duration)
     
     
@@ -345,7 +392,7 @@ class UserControl:
         
         return None,None
         
-    ##Not sure if this function is neccsassaary
+    ##Not sure if this function is needed
     ##This entirely depends on if the Telemetry.csv file needs processing in the python Sdk
     def ReadCSV(self, filePath):
         ##This will read the csv file and return the data in a list of dictionaries
