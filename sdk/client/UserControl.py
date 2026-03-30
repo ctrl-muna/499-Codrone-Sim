@@ -392,7 +392,7 @@ class UserControl:
         
         return None,None
         
-    ##Not sure if this function is neccsassaary
+    ##Not sure if this function is needed
     ##This entirely depends on if the Telemetry.csv file needs processing in the python Sdk
     def ReadCSV(self, filePath):
         ##This will read the csv file and return the data in a list of dictionaries
