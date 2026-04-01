@@ -14,6 +14,7 @@ import re
 import json
 import asyncio
 from UserControl import UserControl
+from DroneSquare import fly_square
 
 async def main():
     DroneController = UserControl()

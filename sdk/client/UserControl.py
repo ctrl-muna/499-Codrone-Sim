@@ -7,7 +7,8 @@ import asyncio
 import math
 
 from projectairsim import ProjectAirSimClient, Drone, World
-from projectairsim.utils import projectairsim_log
+from projectairsim import projectairsim_log
+from DroneSquare import fly_square
 
 
 class UserControl:
@@ -19,7 +20,7 @@ class UserControl:
         self.client = ProjectAirSimClient() 
         self.runNumber = None
         self.takeOff = False
-        self.commandList = ["Reset","Close", "Takeoff", "State_Polling","Land", "Forward", "Backward", "Left", "Right", "Up", "Down", "Yaw_Left", "Yaw_Right"]
+        self.commandList = ["Reset","Close", "Takeoff", "State_Polling","Land", "Forward", "Backward", "Left", "Right", "Up", "Down", "Yaw_Left", "Yaw_Right", "Square"]
         self.com_Pattern = "|".join(self.commandList)
         self.world = None
         self.drone = None 
@@ -156,7 +157,7 @@ class UserControl:
             projectairsim_log().error(f"Error during reset: {e}")
     ##need to add an array of velocities
     async def commandParse(self, com, dur):
-        ## Commands to be implemented "Foward, backward, left, up, down, right, yaw_left, yaw_right, hover, pitch_foward, pitch_back, roll_left, roll_right"
+        ## Commands to be implemented "Foward, backward, left, up, down, right, yaw_left, yaw_right, hover, pitch_foward, pitch_back, roll_left, roll_right and square path"
         ##Duration measured in seconds however i may need to add speed/velocity values
         if com == "Close":
             self.close()
@@ -256,6 +257,14 @@ class UserControl:
                     projectairsim_log().info("Move-Down Invoked")
                     await move_down_task
                     projectairsim_log().info("Move-Down Completed")
+                await self.statePoll(1)
+        elif com == "Square":
+            if not self.takeOff:
+                projectairsim_log().info("Drone is not in the air.")
+            else:
+                projectairsim_log().info("Flying square...")
+                await fly_square(self.drone)
+                projectairsim_log().info("Square flight completed.")
                 await self.statePoll(1)
                 
     def _on_collision(self, collision):
