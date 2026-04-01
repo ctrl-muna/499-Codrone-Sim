@@ -5,7 +5,6 @@ import re
 import json
 import asyncio
 import math
-from turtle import speed
 
 from projectairsim import ProjectAirSimClient, Drone, World
 from projectairsim.utils import projectairsim_log
@@ -24,6 +23,8 @@ class UserControl:
         self.com_Pattern = "|".join(self.commandList)
         self.world = None
         self.drone = None 
+        self.Current_map =None
+        self.maps_config = None
         self.latest_pose = None
         self.collision = False
         self.safeCollisionObjects = ["StaticMeshActor1"]
@@ -34,10 +35,15 @@ class UserControl:
 
     def connect(self):
         try:
+            self._load_maps_config()
+            map_config = self._detect_map()
+            scene_file = map_config.get("scene_config")
+
+
             setupFile = os.path.join(self.project_root, 'runs', 'Startup.json')
             self.client.connect()
             try:
-                self.world = World(self.client, "scene_basic_drone.jsonc", delay_after_load_sec=2)
+                self.world = World(self.client, scene_file, delay_after_load_sec=2)
             except Exception as e:
                 projectairsim_log().error(f"Error creating world: {e}")
 
@@ -56,19 +62,70 @@ class UserControl:
 
         try:
             with open(setupFile, 'r') as f:
-                setUpInfo = json.load(f)
-            ##Get the current Run number
-            self.runNumber = int(setUpInfo.get("RunNumber"))
+                try:
+                    setUpInfo = json.load(f)
+                except Exception:
+                    # Try to recover a RunNumber from malformed JSON (e.g., multiple JSON objects)
+                    f.seek(0)
+                    text = f.read()
+                    m = re.search(r'"RunNumber"\s*:\s*(\d+)', text)
+                    if m:
+                        setUpInfo = {"RunNumber": int(m.group(1))}
+                        projectairsim_log().warning("Startup.json malformed; recovered RunNumber from file.")
+                    else:
+                        setUpInfo = {"RunNumber": 0}
+                        projectairsim_log().warning("Startup.json malformed; defaulting RunNumber to 0.")
+
+            ##Get the current Run number (default to 0 if missing)
+            self.runNumber = int(setUpInfo.get("RunNumber", 0))
             self.CommandFilePath = os.path.join(self.project_root, 'runs', 'RunCommands', f'Run_{self.runNumber}_Commands.csv')
             self.TelemetryFilePath = os.path.join(self.project_root, 'runs', 'RunTelemetry', f'Run_{self.runNumber}_Telemetry.csv')
+
+            # Normalize the Startup.json to a single well-formed JSON object so future reads succeed
+            try:
+                with open(setupFile, 'w') as f:
+                    json.dump({"RunNumber": self.runNumber}, f)
+            except Exception as e:
+                projectairsim_log().warning(f"Failed to normalize Startup.json: {e}")
         except Exception as e:
             projectairsim_log().error(f"Error reading setup file: {e}")
         ##Arm drone and let it be controlled through api
         projectairsim_log().info(f"Connected to AirSim with run number: {self.runNumber}")    
         self.drone.enable_api_control()
         self.drone.arm()
+        self._write_run_header()
         
+    def _load_maps_config(self):
+        maps_file = os.path.join(self.project_root, 'runs', 'maps_config.json')
+        with open(maps_file, 'r') as f:
+            self.maps_config = json.load(f)
+
     
+    def _detect_map(self):
+        """Ask user which map is loaded, then return matching config."""
+        if not self.maps_config:
+            self._load_maps_config()
+        
+        print("Available maps:")
+        for i, map_name in enumerate(self.maps_config.keys()):
+            print(f"  {i+1}. {map_name}")
+        
+        choice = input("Which map is currently open in Unreal? Enter name: ").strip()
+        
+        if choice in self.maps_config:
+            self.current_map = choice
+            return self.maps_config[choice]
+        else:
+            projectairsim_log().warning(f"Map '{choice}' not found in config. Using BasicArena defaults.")
+            self.current_map = "BasicArena"
+            return self.maps_config["BasicArena"]
+
+
+    def _write_run_header(self):
+        """Write map info at top of command file for this run."""
+        with open(self.CommandFilePath, 'a') as f:
+            f.write(f"# Map: {self.current_map}, Run: {self.runNumber}\n")
+
     def save_Command(self, command, Duration):
         current_Date = time.asctime(time.localtime())
         Command_message = f"{current_Date},{command},{Duration}"
@@ -308,12 +365,32 @@ class UserControl:
         projectairsim_log().info("Closing User Control")
         projectairsim_log().info(f"Run number {self.runNumber}, has been closed and saved. Thank you.")
         setupFile = os.path.join(self.project_root, 'runs', 'Startup.json')
-        with open(setupFile, 'r') as f:
-            setUpInfo = json.load(f)
-            RunNumberIncrement = self.runNumber + 1
-            setUpInfo["RunNumber"] = RunNumberIncrement
-        with open(setupFile, 'w') as f:
-            json.dump(setUpInfo, f)
+        # Load or recover RunNumber, tolerate malformed or missing Startup.json
+        try:
+            with open(setupFile, 'r') as f:
+                try:
+                    setUpInfo = json.load(f)
+                except Exception:
+                    f.seek(0)
+                    text = f.read()
+                    m = re.search(r'"RunNumber"\s*:\s*(\d+)', text)
+                    if m:
+                        setUpInfo = {"RunNumber": int(m.group(1))}
+                        projectairsim_log().warning("Startup.json malformed; recovered RunNumber from file during close.")
+                    else:
+                        setUpInfo = {"RunNumber": self.runNumber if isinstance(self.runNumber, int) else 0}
+                        projectairsim_log().warning("Startup.json malformed; defaulting RunNumber during close.")
+        except FileNotFoundError:
+            setUpInfo = {"RunNumber": self.runNumber if isinstance(self.runNumber, int) else 0}
+
+        # Increment the run number and persist a normalized Startup.json
+        RunNumberIncrement = int(setUpInfo.get("RunNumber", 0)) + 1
+        setUpInfo["RunNumber"] = RunNumberIncrement
+        try:
+            with open(setupFile, 'w') as f:
+                json.dump(setUpInfo, f)
+        except Exception as e:
+            projectairsim_log().warning(f"Failed to write Startup.json during close: {e}")
          # Safely shut down drone even if mid-flight
         try:
             self.drone.land()
